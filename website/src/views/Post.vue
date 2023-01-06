@@ -16,8 +16,7 @@
                     <div class="select mb-3">
                         <select v-model="post.author">
                             <option disabled value="">Select author</option>
-                            <option>Alex</option>
-                            <option>Bob</option>
+                            <option v-for="author in authors">{{ author.name }}</option>
                         </select>
                     </div>
                     <textarea class="textarea" placeholder="Body" v-model="post.body" :text="post.body"></textarea>
@@ -85,7 +84,15 @@ export default {
                 body: 'Text goes here',
                 created_at: new Date('2022-12-12 05:00:00'.replace(/-/g,"/")),
                 updated_at: new Date('2022-12-19 06:00:00'.replace(/-/g,"/")) */
-            }
+            },
+
+            // Authors
+            authors: {
+               /* id:
+                name:
+                created_at:
+                updated_at: */
+            },
         };
     },
 
@@ -177,10 +184,17 @@ export default {
                 this.post = res.data;
             else
                 this.postFound = false;
-        }
+        },
+        async getAuthors() {
+            let res = await API.get(Constants.URL_AUTHORS);
+
+            if(res)
+                this.authors = res.data;
+        },
     },
     mounted() {
         this.getPost(this.$route.params.id);
+        this.getAuthors();
     }
 }
 </script>
