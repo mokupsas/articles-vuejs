@@ -145,7 +145,8 @@ export default {
 
             if(!res)
                 this.showMessage(true, 'Problem occurred', 'is-warning');
-            this.showMessage(true, 'Successfully deleted post', 'is-success');
+            else
+                this.showMessage(true, 'Successfully deleted post', 'is-success');
         },
         async editPost(id, title, author, body, created_at) {
             if(!this.checkInput(title, author, body))
@@ -158,7 +159,8 @@ export default {
 
             if(!res)
                 this.showMessage(true, 'Problem occurred', 'is-warning');
-            this.showMessage(true, 'Successfully deleted post', 'is-success');
+            else
+                this.showMessage(true, 'Successfully deleted post', 'is-success');
         },
         checkInput(title, author, body) {
             if(!title || !author || !body )

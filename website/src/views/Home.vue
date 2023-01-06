@@ -222,16 +222,18 @@ export default {
                 this.showMessage(true, 'Problem occurred', 'is-warning');
                 return;
             }
-            this.showMessage(true, 'Successfully deleted post', 'is-success');
+            else
+                this.showMessage(true, 'Successfully deleted post', 'is-success');
         },
         async deletePost(id) {
             let res = await API.delete(Constants.URL_ARTICLES+"/"+id);
-
+            console.log(res);
             if(!res)
             {
                 this.showMessage(true, 'Problem occurred', 'is-warning');
             }
-            this.showMessage(true, 'Successfully deleted post', 'is-success');
+            else
+                this.showMessage(true, 'Successfully deleted post', 'is-success');
         },
         checkInput(title, author, body) {
             if(!title || !author || !body )
@@ -258,21 +260,6 @@ export default {
                 query: { s: this.searchText } 
             });
         },
-
-        /*
-        search() {
-            if(!this.searchText)
-            {
-                this.redirect(this.$route.path);
-                return 0;
-            }
-
-            this.redirect("/?s="+this.searchText);
-        },
-        redirect(path) {
-            router.push(path);
-        }  
-        */
     },
     mounted() {
         // Getting authors
