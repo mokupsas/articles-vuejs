@@ -258,7 +258,7 @@ export default {
             router.push({ 
                 name: 'Page', 
                 query: { s: this.searchText } 
-            });
+            }).catch((error) => {});
         },
     },
     mounted() {
