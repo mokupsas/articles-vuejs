@@ -1,0 +1,50 @@
+{
+  "authors": [
+    {
+      "id": 1,
+      "name": "Bo1b",
+      "created_at": "2022-12-19 07:00:00",
+      "updated_at": "2022-12-19 07:00:00"
+    },
+    {
+      "id": 2,
+      "name": "Alex",
+      "created_at": "2022-12-18 10:24:05",
+      "updated_at": "2022-12-19 06:54:01"
+    }
+  ],
+  "articles": [
+    {
+      "title": "aa",
+      "body": "aa",
+      "author": "Alex",
+      "created_at": "2023-01-04 12:21:21",
+      "updated_at": "2023-01-04 12:21:21",
+      "id": 1
+    },
+    {
+      "title": "1",
+      "body": "1",
+      "author": "Alex",
+      "created_at": "2023-01-05 08:28:05",
+      "updated_at": "2023-01-05 08:28:05",
+      "id": 2
+    },
+    {
+      "title": "3",
+      "body": "333232",
+      "author": "Bo1b",
+      "created_at": "2023-01-05 08:28:08",
+      "updated_at": "2023-01-05 08:28:08",
+      "id": 3
+    },
+    {
+      "title": "f",
+      "body": "gfdg",
+      "author": "Alex",
+      "created_at": "2023-01-05 08:28:22",
+      "updated_at": "2023-01-05 08:28:22",
+      "id": 4
+    }
+  ]
+}
