@@ -129,7 +129,7 @@ export default {
 
             // Post/article data
             page: this.$route.params.page ? this.$route.params.page:1,
-            totalPages: 1,
+            totalPages: 0,
             perPage: 2,
 
             // Search
