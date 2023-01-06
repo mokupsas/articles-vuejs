@@ -1,6 +1,8 @@
 <template>
 
     <ul>
+        <message v-if="postsFound == false" :close="0" type="is-danger">Posts not found</message>
+
         <li class="block" v-for="post in posts">
         
             <h3 class="title is-4">
@@ -26,10 +28,12 @@ import * as Constants  from '../constants'
 import API from '../classes/API'
 // Components
 import Modal from '../components/Modal'
+import Message from '../components/Message'
 
 export default {
     components: {
-        Modal
+        Modal,
+        Message
     },
     data() {
         return {
@@ -37,6 +41,7 @@ export default {
             totalPosts: 1,
             perPage: 2,
             // Data about posts
+            postsFound: true,
             posts: [
                 /* {
                     id: 1,
@@ -65,20 +70,26 @@ export default {
             let args = `?_limit=${this.perPage}&_page=${this.page}&q=${searchQuery}`;
             let res = await API.get(Constants.URL_ARTICLES+args);
 
-            if(res)
+            if(res && res.data.length > 0)
                 return res;
+            
+            this.postsFound = false;
+            return false;
+
         }
     },
     async mounted() {
         let res = await this.getPostsRequest();
 
-        this.posts = res.data;
-        this.totalPosts = res.headers['x-total-count'];
+        if(res)
+        {
+            this.posts = res.data;
+            this.totalPosts = res.headers['x-total-count'];
 
-        let totalPages = Math.ceil(this.totalPosts / this.perPage);
+            let totalPages = Math.ceil(this.totalPosts / this.perPage);
 
-        this.$emit('totalPages', totalPages);
-
+            this.$emit('totalPages', totalPages);
+        }
         /*
         if(this.page > totalPages)
             router.push("/404");

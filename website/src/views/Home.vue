@@ -2,7 +2,8 @@
 
     <div class="columns mt-6">
         <div class="column is-three-quarters">
-            <h1 class="title">Posts</h1>
+            <h1 v-if="!searchText" class="title">Posts</h1>
+            <h1 v-else class="title">Search for: {{ searchText }}</h1>
             <hr/>
 
             <post-preview @totalPages="setTotalPages" @openModalEdit="openEdit" @openModalDelete="openDelete"></post-preview>
@@ -260,6 +261,9 @@ export default {
                 query: { s: this.searchText } 
             }).catch((error) => {});
         },
+    },
+    created() {
+        this.searchText = this.$route.query['s'] ? this.$route.query['s']:null;
     },
     mounted() {
         // Getting authors

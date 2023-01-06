@@ -28,22 +28,11 @@ export default {
             btnLimit: 9
         }
     },
-    created() {
-        //console.log(Math.floor(this.btnLimit / 2))
-        //console.log(this.current)
-        console.log(this.leftOffset(4))
-        //console.log(this.rightOffset(4))  
-    },
     methods: {
         getPages() {
             return this.pages;
         },
         leftOffset(oneSide) {
-            /*
-            console.log('-')
-            console.log(this.current)
-            console.log(this.pages - oneSide)
-            */
             if(this.current > this.pages - oneSide)   
                 return this.current - this.pages + oneSide;
             return 0;
@@ -54,9 +43,6 @@ export default {
             return 0;
         },
         buttonLimit(page) {
-            /*  Pagination structre
-                (left side) (center - current page) (right side)
-            */
             let oneSide = Math.floor(this.btnLimit / 2);
             let min = this.current - oneSide - this.leftOffset(oneSide);
             let max = this.current + oneSide + this.rightOffset(oneSide);
