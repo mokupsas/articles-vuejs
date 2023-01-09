@@ -203,11 +203,13 @@ export default {
             let json = JsonBuilder.getArticleJson(title, body, author, dater.regularFormat(), dater.regularFormat())
             let res = await API.create(Constants.URL_ARTICLES, json);
 
-            // On success
             if(res)
-                this.showMessage(true, 'Successfully deleted post', 'is-success');
-            
-            this.cleanInput();
+            {
+                this.showMessage(true, 'Successfully created post', 'is-success');
+            }
+            else {
+                this.showMessage(true, 'Problem occurred', 'is-warning');
+            }
         },
         async editPost(id, title, author, body, created_at) {
             if(!this.checkInput(title, author, body))
@@ -218,23 +220,23 @@ export default {
 
             let res = await API.put(Constants.URL_ARTICLES+"/"+id, json);
 
-            if(!res)
+            if(res)
             {
-                this.showMessage(true, 'Problem occurred', 'is-warning');
+                this.showMessage(true, 'Successfully deleted post', 'is-success');
                 return;
             }
             else
-                this.showMessage(true, 'Successfully deleted post', 'is-success');
+                this.showMessage(true, 'Problem occurred', 'is-warning');
         },
         async deletePost(id) {
             let res = await API.delete(Constants.URL_ARTICLES+"/"+id);
-            console.log(res);
-            if(!res)
+
+            if(res)
             {
-                this.showMessage(true, 'Problem occurred', 'is-warning');
+                this.showMessage(true, 'Successfully deleted post', 'is-success');
             }
             else
-                this.showMessage(true, 'Successfully deleted post', 'is-success');
+                this.showMessage(true, 'Problem occurred', 'is-warning');
         },
         checkInput(title, author, body) {
             if(!title || !author || !body )
