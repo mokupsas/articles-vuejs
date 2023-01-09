@@ -2,37 +2,34 @@
 
     <div class="modal is-active">
         <div class="modal-background"></div>
-        <div class="modal-card">
-            <header class="modal-card-head">
-                <p class="modal-card-title">
-                    <slot name="title"></slot>
-                </p>
-                <button button class="delete" aria-label="close" @click="closeModal"></button>
-            </header>
-            <section class="modal-card-body">
+        <div class="modal-card">   
+
+            <component :is="type" :authors="authors" :post="post" @closeModal="closeModal">
                 <slot></slot>
-            </section>
-            <footer class="modal-card-foot">
-                <button class="button is-success" @click="$emit('acceptedModal')">{{ this.acptBtn }}</button>
-                <button class="button" @click="closeModal">{{ this.cnclBtn }}</button>
-            </footer>
+            </component>
+
         </div>
     </div>
 
 </template>
 
 <script>
+// Components
+import CreatePost from './modalcontent/CreatePost'
+import DeletePost from './modalcontent/DeletePost'
+import EditPost from './modalcontent/EditPost'
+
 export default {
+    components: {
+        'create': CreatePost,
+        'delete': DeletePost,
+        'edit': EditPost,
+    },
     name: "Modal",
     props: {
-        acptBtn: {
-            type: String,
-            default: "Save changes"
-        },
-        cnclBtn: {
-            type: String,
-            default: "Cancel"
-        }
+        type: { required: true },
+        authors: { required: true },
+        post: { default: {} }
     },
     data() {
         return {

@@ -23,6 +23,7 @@ export default {
         current: { default: 1 },    // current page
         pages: { default: 1 }      // total pages 
     },
+    /*
     watch: {
         $route: {
             immediate: true,
@@ -33,6 +34,7 @@ export default {
             }
         }
     },
+    */
     data() {
         return {
             btnLimit: 9

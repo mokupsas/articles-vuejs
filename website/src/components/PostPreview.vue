@@ -140,6 +140,9 @@ export default {
     },
     async mounted() {
         this.posts = await this.getPosts();
+    },
+    created() {
+        console.log(this.post)
     }
 }
 </script>
