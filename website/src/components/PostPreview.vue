@@ -22,7 +22,6 @@
 
 <script>
 // Routes
-import router from '../routes'
 import * as Constants  from '../constants'
 // Classes
 import API from '../classes/API'
