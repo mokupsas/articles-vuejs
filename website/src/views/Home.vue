@@ -6,7 +6,7 @@
             <h1 v-else class="title">Search for: {{ searchText }}</h1>
             <hr/>
 
-            <post-preview :deletePost="deleteId" :editPost="post" @totalPages="setTotalPages" @openModalEdit="openEdit" @openModalDelete="openDelete"></post-preview>
+            <post-preview :deletePost="deleteId" :editPost="post" :search="searchText" @totalPages="setTotalPages" @openModalEdit="openEdit" @openModalDelete="openDelete"></post-preview>
 
             <pagination :current="page" :pages="totalPages"></pagination>
 
@@ -52,7 +52,7 @@
             <div class="field mb-5">
                 <label class="label">Search</label>
                 <div class="control mb-2">
-                    <input class="input" type="text" placeholder="Text input" v-model="searchText">
+                    <input class="input" type="text" placeholder="Text input" ref="searchInput">
                 </div>
                 <button class="button" @click="search">Search</button>
             </div>
@@ -135,7 +135,7 @@ export default {
             perPage: 10,
 
             // Search
-            searchText: null
+            searchText: ''
         }
     },
     methods: {
@@ -262,14 +262,13 @@ export default {
                 this.authors = res.data;
         },
         search() {
+            this.searchText = this.$refs.searchInput.value;
+            
             router.push({ 
                 name: 'Page', 
                 query: { s: this.searchText } 
             }).catch((error) => {});
         },
-    },
-    created() {
-        this.searchText = this.$route.query['s'] ? this.$route.query['s']:null;
     },
     mounted() {
         // Getting authors

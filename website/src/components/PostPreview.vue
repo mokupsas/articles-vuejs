@@ -40,6 +40,26 @@ export default {
         perPage: { default: 10 },
         deletePost: { default: null },
         editPost: { default: null },
+        search: { default: ''},
+    },
+    data() {
+        return {
+            page: this.$route.params.page ? this.$route.params.page:1,
+            totalPosts: 1,
+            // Data about posts
+            postsFound: true,
+            posts: [
+                /* {
+                    id: 1,
+                    title: 'Title1',
+                    author: 'Author',
+                    body: 'Text goes here',
+                    created_at: new Date('2022-12-12 05:00:00'.replace(/-/g,"/")),
+                    updated_at: new Date('2022-12-19 06:00:00'.replace(/-/g,"/"))
+                } */
+            ],
+            error: false
+        }
     },
     watch: {
         deletePost: {
@@ -64,25 +84,14 @@ export default {
                     this.posts[index].updated_at = newValue.updated_at;
                 }
             }
-        }
-    },
-    data() {
-        return {
-            page: this.$route.params.page ? this.$route.params.page:1,
-            totalPosts: 1,
-            // Data about posts
-            postsFound: true,
-            posts: [
-                /* {
-                    id: 1,
-                    title: 'Title1',
-                    author: 'Author',
-                    body: 'Text goes here',
-                    created_at: new Date('2022-12-12 05:00:00'.replace(/-/g,"/")),
-                    updated_at: new Date('2022-12-19 06:00:00'.replace(/-/g,"/"))
-                } */
-            ],
-            error: false
+        },
+        search: {
+            immediate: true,
+            async handler(newValue, oldValue) {
+               console.log(newValue)
+               this.search = newValue;
+               this.posts = await this.getPosts();
+            }
         }
     },
     methods: {
@@ -96,37 +105,31 @@ export default {
             }
             return `Posted at ${post.created_at}`;
         },
-        async getPostsRequest() {
-            let searchQuery = this.$route.query['s'] ? this.$route.query['s']  : '';
-            let args = `?_limit=${this.perPage}&_page=${this.page}&q=${searchQuery}`;
+        async getPosts() {
+            
+            let args = `?_limit=${this.perPage}&_page=${this.page}&q=${this.search}`;
+            console.log(Constants.URL_ARTICLES+args)
             let res = await API.get(Constants.URL_ARTICLES+args);
 
             if(res && res.data.length > 0)
-                return res;
+            {
+                this.postsFound = true;
+                this.totalPosts = res.headers['x-total-count'];
+                let totalPages = Math.ceil(this.totalPosts / this.perPage);
+                this.$emit('totalPages', totalPages);
+                console.log(totalPages);
+                return res.data;
+            }
             else if(!res)
                 this.error = true
             
+            this.$emit('totalPages', 0);
             this.postsFound = false;
-            return false;
-
+            return [];
         }
     },
     async mounted() {
-        let res = await this.getPostsRequest();
-
-        if(res)
-        {
-            this.posts = res.data;
-            this.totalPosts = res.headers['x-total-count'];
-
-            let totalPages = Math.ceil(this.totalPosts / this.perPage);
-
-            this.$emit('totalPages', totalPages);
-        }
-        /*
-        if(this.page > totalPages)
-            router.push("/404");
-            */
+        this.posts = await this.getPosts();
     }
 }
 </script>

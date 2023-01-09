@@ -4,7 +4,7 @@
     <navigation></navigation>
 
     <div class="container">
-      <router-view :key="this.$route.fullPath"></router-view>
+      <router-view></router-view>
     </div>
 
   </div>
