@@ -1,7 +1,9 @@
 <template>
 
     <ul>
-        <message v-if="postsFound == false" :close="0" type="is-danger">Posts not found</message>
+        <message v-if="!postsFound && !error" :close="0" type="is-danger">Posts not found</message>
+        <message v-if="error" :close="0" type="is-danger">An error has occurred</message>
+
 
         <li class="block" v-for="post in posts">
         
@@ -79,7 +81,8 @@ export default {
                     created_at: new Date('2022-12-12 05:00:00'.replace(/-/g,"/")),
                     updated_at: new Date('2022-12-19 06:00:00'.replace(/-/g,"/"))
                 } */
-            ]
+            ],
+            error: false
         }
     },
     methods: {
@@ -100,6 +103,8 @@ export default {
 
             if(res && res.data.length > 0)
                 return res;
+            else if(!res)
+                this.error = true
             
             this.postsFound = false;
             return false;
