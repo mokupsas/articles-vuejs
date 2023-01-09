@@ -8,8 +8,8 @@
         <ul class="pagination-list">
             <li v-for="page in parseInt(this.pages)">
                 <div v-if="buttonLimit(page)">
-                    <router-link v-if="page == current" :to="{name: `Page`, params: { page: page}}" class="pagination-link is-current">{{ page }}</router-link>
-                    <router-link v-else :to="{name: `Page`, params: { page: page}}" class="pagination-link">{{ page }}</router-link>
+                    <router-link v-if="page == current" :to="{name: `Page`, params: { page: page}}" class="pagination-link is-current" @click.native="$emit('currentPage', page)">{{ page }}</router-link>
+                    <router-link v-else :to="{name: `Page`, params: { page: page}}" class="pagination-link" @click.native="$emit('currentPage', page)">{{ page }}</router-link>
                 </div>
             </li>
         </ul>
@@ -22,6 +22,16 @@ export default {
     props: {
         current: { default: 1 },    // current page
         pages: { default: 1 }      // total pages 
+    },
+    watch: {
+        $route: {
+            immediate: true,
+            deep: true,
+            async handler(newValue, oldValue) {
+                if(newValue.params.page != 'undefined')
+                    this.current = newValue.params.page;
+            }
+        }
     },
     data() {
         return {
@@ -50,6 +60,9 @@ export default {
             if(page >= min && page <= max)
                 return true;
             return false;
+        },
+        test() {
+            console.log('aaaa')
         }
     }
 }

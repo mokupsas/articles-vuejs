@@ -8,7 +8,7 @@
 
             <post-preview :deletePost="deleteId" :editPost="post" :search="searchText" @totalPages="setTotalPages" @openModalEdit="openEdit" @openModalDelete="openDelete"></post-preview>
 
-            <pagination :current="page" :pages="totalPages"></pagination>
+            <pagination :current="page" :pages="totalPages" @currentPage="changePage"></pagination>
 
             <modal v-if="modalShow" @acceptedModal="acceptedModal()" @closeModal="showModal(false)" :acptBtn="modalAcptText">
                 <template slot="title">{{ modalTitle }}</template>
@@ -130,7 +130,7 @@ export default {
             },
 
             // Post/article data
-            page: this.$route.params.page ? this.$route.params.page:1,
+            page: 1,
             totalPages: 0,
             perPage: 10,
 
@@ -269,6 +269,12 @@ export default {
                 query: { s: this.searchText } 
             }).catch((error) => {});
         },
+        changePage(page) {
+            if(this.page != page)
+            {
+                console.log(page);
+            }
+        }
     },
     mounted() {
         // Getting authors

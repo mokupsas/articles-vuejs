@@ -44,7 +44,7 @@ export default {
     },
     data() {
         return {
-            page: this.$route.params.page ? this.$route.params.page:1,
+            page: 1,
             totalPosts: 1,
             // Data about posts
             postsFound: true,
@@ -88,9 +88,19 @@ export default {
         search: {
             immediate: true,
             async handler(newValue, oldValue) {
-               console.log(newValue)
                this.search = newValue;
                this.posts = await this.getPosts();
+            }
+        },
+        $route: {
+            immediate: true,
+            deep: true,
+            async handler(newValue, oldValue) {
+                if(newValue.params.page != 'undefined')
+                {
+                    this.page = newValue.params.page;
+                    this.posts = await this.getPosts();
+                }
             }
         }
     },
@@ -108,7 +118,7 @@ export default {
         async getPosts() {
             
             let args = `?_limit=${this.perPage}&_page=${this.page}&q=${this.search}`;
-            console.log(Constants.URL_ARTICLES+args)
+
             let res = await API.get(Constants.URL_ARTICLES+args);
 
             if(res && res.data.length > 0)
@@ -117,7 +127,7 @@ export default {
                 this.totalPosts = res.headers['x-total-count'];
                 let totalPages = Math.ceil(this.totalPosts / this.perPage);
                 this.$emit('totalPages', totalPages);
-                console.log(totalPages);
+                
                 return res.data;
             }
             else if(!res)
