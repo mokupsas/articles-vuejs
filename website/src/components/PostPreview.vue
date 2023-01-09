@@ -35,11 +35,13 @@ export default {
         Modal,
         Message
     },
+    props: {
+        perPage: { default: 10 },
+    },
     data() {
         return {
             page: this.$route.params.page ? this.$route.params.page:1,
             totalPosts: 1,
-            perPage: 2,
             // Data about posts
             postsFound: true,
             posts: [
