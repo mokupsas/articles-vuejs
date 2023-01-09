@@ -36,6 +36,33 @@ export default {
     },
     props: {
         perPage: { default: 10 },
+        deletePost: { default: null },
+        editPost: { default: null },
+    },
+    watch: {
+        deletePost: {
+            immediate: true,
+            handler(newValue, oldValue) {
+                if(newValue >= 0)
+                {
+                    let index = this.posts.findIndex(item => item.id === newValue)
+                    this.posts.splice(index, 1)
+                }
+            }
+        },
+        editPost: {
+            immediate: true,
+            handler(newValue, oldValue) {
+                if(newValue.id !== undefined)
+                {
+                    let index = this.posts.findIndex(item => item.id === newValue.id)
+                    this.posts[index].title = newValue.title;
+                    this.posts[index].body = newValue.body;
+                    this.posts[index].author = newValue.author;
+                    this.posts[index].updated_at = newValue.updated_at;
+                }
+            }
+        }
     },
     data() {
         return {

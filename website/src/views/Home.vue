@@ -1,12 +1,12 @@
 <template>
 
-    <div class="columns mt-6">
+    <div class="columns mt-6 mb-6">
         <div class="column is-three-quarters">
             <h1 v-if="!searchText" class="title">Posts</h1>
             <h1 v-else class="title">Search for: {{ searchText }}</h1>
             <hr/>
 
-            <post-preview @totalPages="setTotalPages" @openModalEdit="openEdit" @openModalDelete="openDelete"></post-preview>
+            <post-preview :deletePost="deleteId" :editPost="post" @totalPages="setTotalPages" @openModalEdit="openEdit" @openModalDelete="openDelete"></post-preview>
 
             <pagination :current="page" :pages="totalPages"></pagination>
 
@@ -119,6 +119,8 @@ export default {
                 updated_at: '2022-12-19 06:00:00' */
             },
 
+            deleteId: -1,
+
             // Authors
             authors: {
                /* id:
@@ -222,8 +224,9 @@ export default {
 
             if(res)
             {
-                this.showMessage(true, 'Successfully deleted post', 'is-success');
-                return;
+                this.showMessage(true, 'Successfully edited post', 'is-success');
+                this.post = json;
+                this.post.id = id;
             }
             else
                 this.showMessage(true, 'Problem occurred', 'is-warning');
@@ -234,6 +237,7 @@ export default {
             if(res)
             {
                 this.showMessage(true, 'Successfully deleted post', 'is-success');
+                this.deleteId = id; // given to post-preview as property
             }
             else
                 this.showMessage(true, 'Problem occurred', 'is-warning');
