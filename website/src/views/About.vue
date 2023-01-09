@@ -60,8 +60,16 @@
                         <td>integer</td>
                     </tr>
                     <tr>
-                        <td>name</td>
+                        <td>title</td>
                         <td>text</td>
+                    </tr>
+                    <tr>
+                        <td>body</td>
+                        <td>text</td>
+                    </tr>
+                    <tr>
+                        <td>author</td>
+                        <td>integer / id from author table</td>
                     </tr>
                     <tr>
                         <td>created_at</td>
