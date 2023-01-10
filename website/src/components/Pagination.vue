@@ -8,8 +8,8 @@
         <ul class="pagination-list">
             <li v-for="page in parseInt(this.pages)">
                 <div v-if="buttonLimit(page)">
-                    <router-link v-if="page == current" :to="{name: `Page`, params: { page: page}}" class="pagination-link is-current" @click.native="$emit('currentPage', page)">{{ page }}</router-link>
-                    <router-link v-else :to="{name: `Page`, params: { page: page}}" class="pagination-link" @click.native="$emit('currentPage', page)">{{ page }}</router-link>
+                    <router-link v-if="page == current" :to="{name: `Home`, params: { page: page}}" class="pagination-link is-current" @click.native="$emit('currentPage', page)">{{ page }}</router-link>
+                    <router-link v-else :to="{name: `Home`, params: { page: page}}" class="pagination-link" @click.native="$emit('currentPage', page)">{{ page }}</router-link>
                 </div>
             </li>
         </ul>

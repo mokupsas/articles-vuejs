@@ -11,13 +11,8 @@ Vue.use(VueRouter);
 
 let routes = [
     {
-        path: '/',
+        path: '/:page?',
         name: 'Home',
-        component: Home
-    },
-    {
-        path: '/page/:page?',
-        name: 'Page',
         component: Home
     },
     {
