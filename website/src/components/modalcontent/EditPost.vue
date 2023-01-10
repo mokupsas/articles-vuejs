@@ -19,7 +19,7 @@
                     <option v-for="author in authors">{{ author.name }}</option>
                 </select>
             </div>
-            <textarea class="textarea" placeholder="Body">{{ body }}</textarea>
+            <textarea class="textarea" placeholder="Body" v-model="body">{{ body }}</textarea>
 
         </section>
 

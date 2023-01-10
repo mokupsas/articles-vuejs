@@ -10,7 +10,7 @@
 
             <h1 class="title">{{ post.title }}</h1>
             <p class="subtitle is-6">
-                <div v-if="this.post.id">{{ displayDate(post) }} by {{ post.author }}</div>
+                <div v-if="!error">{{ displayDate(post) }} by {{ post.author }}</div>
             </p>
 
             <hr/>
@@ -19,7 +19,7 @@
                 {{ post.body }}
             </p>
         </div>
-        <div v-if="this.post.id" class="column">
+        <div v-if="!error" class="column">
             <label class="label">Actions</label>
                 <ul>
                     <li><a href="#" onclick="return false;" @click="openEdit()">Edit</a></li>
@@ -32,6 +32,7 @@
 </template>
 
 <script>
+import router from '../routes'
 import * as Constants  from '../constants'
 // Classes
 import API from '../classes/API'
@@ -52,7 +53,7 @@ export default {
             // delete
             // edit
             modalType: null,
-            modalPost: 'aa',    // post to display data inside modal
+            modalPost: null,    // post to display data inside modal
 
             // Modal message
             msgShow: false,
@@ -123,7 +124,7 @@ export default {
         openDelete() {
             this.showModal(true, 'delete', this.post);
         },
-        acceptedModal() {
+        acceptedModal(data) {
             // If we delete post
             if(this.modalType == 'delete')
             {
@@ -132,7 +133,7 @@ export default {
             // If we edit post
             else
             {
-                this.editPost(this.post.id, this.post.title, this.post.author, this.post.body, this.post.created_at);
+                this.editPost(data.id, data.title, data.author, data.body, data.created_at);
             }
         },
         async deletePost(id) {
@@ -142,6 +143,9 @@ export default {
             {
                 this.showMessage(true, 'Successfully deleted post', 0, 'is-success');
                 this.showModal(false);
+
+                // Redirecting to home page
+                router.push({ name: 'Home', });
             }
             else
                 this.showMessage(true, 'Problem occurred', 1, 'is-warning');
@@ -157,6 +161,9 @@ export default {
 
             if(res)
             {
+                this.post = json;
+                this.post.id = id;  // json doesnt have ID, so we add manually
+
                 this.showMessage(true, 'Successfully edited post', 0, 'is-success');
                 this.showModal(false);
             }
@@ -176,8 +183,9 @@ export default {
 
             if(res)
                return res.data;
-            
-            this.error = true;
+            else if(!res)
+                this.error = true;
+
             return [];
         },
         async getAuthors() {
