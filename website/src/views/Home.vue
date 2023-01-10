@@ -269,7 +269,7 @@ export default {
 
         if(!this.posts[0] && this.error)
             this.showMessage(true, 'Problem occurred', 0, 'is-danger');
-        else
+        else if(!this.posts[0])
             this.showMessage(true, 'No posts found', 0, 'is-warning');
     }
 }
