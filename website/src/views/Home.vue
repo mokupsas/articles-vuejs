@@ -261,7 +261,7 @@ export default {
             this.searchText = this.$refs.searchInput.value;
 
             router.push({ 
-                name: 'Page', 
+                name: 'Home', 
                 query: { s: this.searchText } 
             }).catch((error) => {});
 
@@ -300,7 +300,7 @@ export default {
         this.searchText = this.getSearchedFor();
 
         // Getting current page if given
-        this.page = this.$route.params.page ? this.$route.params.page : this.page
+        this.page = this.$route.params.page ? this.$route.params.page : this.page;
     },
     async mounted() {
         // Getting authors

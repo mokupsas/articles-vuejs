@@ -11,11 +11,6 @@ Vue.use(VueRouter);
 
 let routes = [
     {
-        path: '/:page?',
-        name: 'Home',
-        component: Home
-    },
-    {
         path: '/post/:id',
         name: 'Post',
         component: Post
@@ -25,6 +20,11 @@ let routes = [
         name: 'About',
         component: About
     },
+    {
+        path: '/:page?',
+        name: 'Home',
+        component: Home
+    },   
     {
         path: '*',
         name: '404',
