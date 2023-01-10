@@ -10,9 +10,11 @@
 
         <section class="modal-card-body">
 
+            <slot></slot>
+
             <input class="input mb-3" type="text" placeholder="Title" v-model="title">
             <div class="select mb-3">
-                <select>
+                <select v-model="author">
                     <option selected disabled value="">Select author</option>
                     <option v-for="author in authors">{{ author.name }}</option>
                 </select>
@@ -22,7 +24,7 @@
         </section>
 
         <footer class="modal-card-foot">
-            <button class="button is-success" @click="$emit('acceptedModal')">Create</button>
+            <button class="button is-success" @click="$emit('acceptedModal', getPostData())">Create</button>
             <button class="button" @click="closeModal">Close</button>
         </footer>
     </div>
@@ -38,13 +40,22 @@ export default {
     data() {
         return {
             title: null,
-            body: null
+            body: null,
+            author: ""
         }
     },
     methods: {
         closeModal()
         {
             this.$emit('closeModal')
+        },
+        // Creates object with inputed data
+        getPostData() {
+            return {
+                title: this.title,
+                body: this.body,
+                author: this.author
+            }
         }
     }
 }

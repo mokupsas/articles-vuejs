@@ -4,7 +4,7 @@
         <div class="modal-background"></div>
         <div class="modal-card">   
 
-            <component :is="type" :authors="authors" :post="post" @closeModal="closeModal">
+            <component :is="type" :authors="authors" :post="post" @acceptedModal="sendData" @closeModal="closeModal">
                 <slot></slot>
             </component>
 
@@ -29,7 +29,7 @@ export default {
     props: {
         type: { required: true },
         authors: { required: true },
-        post: { default: {} }
+        post: { required: false }
     },
     data() {
         return {
@@ -40,6 +40,33 @@ export default {
         closeModal()
         {
             this.$emit('closeModal')
+        },
+        // Returns post id if edited or input object if created post
+        getPostId() {
+            if(typeof this.post !== 'undefined')
+                return this.post.id;
+            return null;
+        },
+        sendData(data) {
+            let ret = this.makeData(data);
+            this.$emit('acceptedModal', ret);
+        },
+        makeData(data) {
+            // When creating, returns input object
+            // ---
+            // data.title
+            // data.author
+            // data.body
+            if(this.type == 'create')
+                return data;
+            // When post editing or deleting, returns post id
+            else
+            {
+               if(typeof this.post !== 'undefined')
+                        return this.post.id;
+            }
+
+            return null;
         }
     }
 }

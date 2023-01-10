@@ -2,26 +2,10 @@
 
     <div class="columns mt-6">
         <div class="column is-three-quarters">
-            <message v-if="postFound == false" :close="0" type="is-danger">Post not found</message>
+            <message v-show="msgShow && msgLocation == 0" :type="msgStyle" :close="0" @closeMessage="showMessage(false)">{{ msgText }}</message>
 
-            <modal v-if="modalShow" @acceptedModal="acceptedModal()" @closeModal="showModal(false)" :acptBtn="modalAcptText">
-                <template slot="title">{{ modalTitle }}</template>
-            
-                <message :type="msgType" close="1" v-show="msgShow" @closeMessage="showMessage(false)">{{ msgText }}</message>       
-
-                <div v-if="this.modalType === 0">Post will be deleted permenently</div>
-                <div v-if="this.modalType === 1">
-
-                    <input class="input mb-3" type="text" placeholder="Title" v-model="post.title" :text="post.title">
-                    <div class="select mb-3">
-                        <select v-model="post.author">
-                            <option disabled value="">Select author</option>
-                            <option v-for="author in authors">{{ author.name }}</option>
-                        </select>
-                    </div>
-                    <textarea class="textarea" placeholder="Body" v-model="post.body" :text="post.body"></textarea>
-
-                </div>
+            <modal v-if="modalShow" :type="modalType" :authors="authors" :post="modalPost" @acceptedModal="acceptedModal" @closeModal="showModal(false)">
+                <message v-show="msgShow && msgLocation == 1" :type="msgStyle" close="1" @closeMessage="showMessage(false)">{{ msgText }}</message>
             </modal>
 
             <h1 class="title">{{ post.title }}</h1>
@@ -63,16 +47,20 @@ export default {
         return {
             // Modal
             modalShow: false,
-            modalTitle: null,
             // Types:
-            // 0 - delete
-            // 1 - edit
+            // create
+            // delete
+            // edit
             modalType: null,
-            modalAcptText: null,
+            modalPost: 'aa',    // post to display data inside modal
 
             // Modal message
             msgShow: false,
-            msgType: null,    // bulma css style
+            msgStyle: null,    // bulma css style
+            // Locations:
+            // 0 - inside page
+            // 1 - inside modal
+            msgLocation: null,
             msgText: null,
 
             // Post data
@@ -97,21 +85,20 @@ export default {
     },
 
     methods: {
-        showModal(show, title, type, acptText) {
+        showModal(show, type, post) {
             if(!show)
             {
                 this.modalShow = false;
-                this.showMessage(false);
-                this.fetchId = null;
+                if(this.msgLocation == 1)
+                    this.showMessage(false);
                 return 0; 
             }
 
             this.modalShow = true
-            this.modalTitle = title;
             this.modalType = type;
-            this.modalAcptText = acptText;
+            this.modalPost = post;
         },
-        showMessage(show, text, style) {
+        showMessage(show, text, loc, style) {
             if(!show)
             {
                 this.msgShow = false;
@@ -119,9 +106,10 @@ export default {
             }
 
             this.msgShow = true;
-            this.msgType = style; 
+            this.msgLocation = loc; 
+            this.msgStyle = style; 
             this.msgText = text;
-        }, 
+        },
         displayDate(post) {
             if (post.updated_at > post.created_at)
             {
@@ -130,14 +118,14 @@ export default {
             return `Posted at ${post.created_at}`;
         },
         openEdit() {
-            this.showModal(true, 'Create post', 1, 'Edit');
+            this.showModal(true, 'edit', this.post);
         },
         openDelete() {
-            this.showModal(true, 'Delete post', 0, 'Delete');
+            this.showModal(true, 'delete', this.post);
         },
         acceptedModal() {
             // If we delete post
-            if(this.modalType === 0)
+            if(this.modalType == 'delete')
             {
                 this.deletePost(this.post.id);
             }
@@ -150,10 +138,13 @@ export default {
         async deletePost(id) {
             let res = await API.delete(Constants.URL_ARTICLES+"/"+id);
 
-            if(!res)
-                this.showMessage(true, 'Problem occurred', 'is-warning');
+            if(res)
+            {
+                this.showMessage(true, 'Successfully deleted post', 0, 'is-success');
+                this.showModal(false);
+            }
             else
-                this.showMessage(true, 'Successfully deleted post', 'is-success');
+                this.showMessage(true, 'Problem occurred', 1, 'is-warning');
         },
         async editPost(id, title, author, body, created_at) {
             if(!this.checkInput(title, author, body))
@@ -164,15 +155,18 @@ export default {
 
             let res = await API.put(Constants.URL_ARTICLES+"/"+id, json);
 
-            if(!res)
-                this.showMessage(true, 'Problem occurred', 'is-warning');
+            if(res)
+            {
+                this.showMessage(true, 'Successfully edited post', 0, 'is-success');
+                this.showModal(false);
+            }
             else
-                this.showMessage(true, 'Successfully deleted post', 'is-success');
+                this.showMessage(true, 'Problem occurred', 1, 'is-warning');
         },
         checkInput(title, author, body) {
             if(!title || !author || !body )
             {
-                this.showMessage(true, 'You must fill all fields', 'is-warning');
+                this.showMessage(true, 'You must fill all fields', 1, 'is-warning');
                 return false;
             }
             return true;
@@ -181,20 +175,24 @@ export default {
             let res = await API.get(Constants.URL_ARTICLES+"/"+id);
 
             if(res)
-                this.post = res.data;
-            else
-                this.postFound = false;
+               return res.data;
+            
+            return [];
         },
         async getAuthors() {
             let res = await API.get(Constants.URL_AUTHORS);
 
             if(res)
-                this.authors = res.data;
+                return res.data;
+            return false;
         },
     },
-    mounted() {
-        this.getPost(this.$route.params.id);
-        this.getAuthors();
+    async mounted() {
+        let post_id = this.$route.params.id;
+        // Getting authors
+        this.authors = await this.getAuthors();
+        // Getting current post
+        this.post = await this.getPost(post_id); 
     }
 }
 </script>

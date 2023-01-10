@@ -10,6 +10,8 @@
 
         <section class="modal-card-body">
 
+            <slot></slot>
+
             <p>Post will be deleted permenently</p>
         </section>
 

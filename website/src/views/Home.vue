@@ -3,17 +3,17 @@
     <div class="columns mt-6 mb-6">
         <div class="column is-three-quarters">
 
-            <message v-show="msgShow && msgLocation == 0" :type="msgStyle" :close="0" @closeMessage="showMessage(false)">j</message>
+            <message v-show="msgShow && msgLocation == 0" :type="msgStyle" :close="0" @closeMessage="showMessage(false)">{{ msgText }}</message>
            
             <h1 v-if="!searchText" class="title">Posts</h1>
             <h1 v-else class="title">Search for: {{ searchText }}</h1>
             <hr/>
 
-            <modal v-if="modalShow" :type="modalType" :authors="authors" :post="post" @acceptedModal="acceptedModal()" @closeModal="showModal(false)">
-                <message v-show="msgShow && msgLocation == 1" :type="msgStyle" close="1" @closeMessage="showMessage(false)">j</message>
+            <modal v-if="modalShow" :type="modalType" :authors="authors" :post="modalPost" @acceptedModal="acceptedModal" @closeModal="showModal(false)">
+                <message v-show="msgShow && msgLocation == 1" :type="msgStyle" close="1" @closeMessage="showMessage(false)">{{ msgText }}</message>
             </modal>
-            
-            <post-preview :deletePost="deleteId" :editPost="post" :search="searchText" @totalPages="setTotalPages" @openModalEdit="openEdit" @openModalDelete="openDelete"></post-preview>
+
+            <post-card v-for="post in posts" :post="post" @openDelete="openDelete" @openEdit="openEdit"></post-card>
 
             <pagination :current="page" :pages="totalPages" @currentPage="changePage"></pagination>
             
@@ -55,22 +55,21 @@ import DateFormater from '../classes/DateFormater'
 // Components
 import Modal from './../components/Modal'
 import Message from './../components/Message'
-import PostPreview from './../components/PostPreview'
+import PostCard from './../components/PostCard'
 import Pagination from './../components/Pagination'
 
 export default {
-    components: { Modal, Message, Pagination, PostPreview },
+    components: { Modal, Message, Pagination, PostCard },
     data() {
         return {
             // Modal
             modalShow: false,
-            modalTitle: null,
             // Types:
             // create
             // delete
             // edit
             modalType: null,
-            modalAcptText: null,
+            modalPost: 'aa',    // post to display data inside modal
 
             // Modal message
             msgShow: false,
@@ -81,25 +80,17 @@ export default {
             msgLocation: null,
             msgText: null,
 
-            // Create post form
-            title: '',
-            author: '',
-            body: '',
-
-            // Edit or delete post ID
-            fetchId: null,
-
-            // Post data to edit
-            post: {
-                id: 1,
-                title: 'Title1',
-                author: 'Alex',
-                body: 'Text goes here',
-                created_at: '2022-12-12 05:00:00',
-                updated_at: '2022-12-19 06:00:00'
-            },
-
-            deleteId: -1,
+            posts: [
+                /* {
+                    id: 1,
+                    title: 'Title1',
+                    author: 'Author',
+                    body: 'Text goes here',
+                    created_at: new Date('2022-12-12 05:00:00'.replace(/-/g,"/")),
+                    updated_at: new Date('2022-12-19 06:00:00'.replace(/-/g,"/"))
+                } */
+            ],
+            error: false,
 
             // Authors
             authors: {
@@ -109,7 +100,7 @@ export default {
                 updated_at: */
             },
 
-            // Post/article data
+            // Pagination
             page: 1,
             totalPages: 0,
             perPage: 10,
@@ -119,22 +110,18 @@ export default {
         }
     },
     methods: {
-        setTotalPages(pages) {
-            this.totalPages = pages;
-        },
-        showModal(show, title, type, acptText) {
+        showModal(show, type, post) {
             if(!show)
             {
                 this.modalShow = false;
-                this.showMessage(false);
-                this.fetchId = null;
+                if(this.msgLocation == 1)
+                    this.showMessage(false);
                 return 0; 
             }
 
             this.modalShow = true
-            this.modalTitle = title;
             this.modalType = type;
-            this.modalAcptText = acptText;
+            this.modalPost = post;
         },
         showMessage(show, text, loc, style) {
             if(!show)
@@ -149,50 +136,51 @@ export default {
             this.msgText = text;
         },
         openCreate() {
-            this.showModal(true, 'Create post', 'create', 'Create');
+            this.showModal(true, 'create');
         },
-        async openEdit(id) {
-            this.showModal(true, 'Edit post', 'edit', 'Edit');
-            this.fetchId = id;
-
-            // Fetching post data into input
-            let res = await API.get(Constants.URL_ARTICLES+"/"+this.fetchId);
-            this.post = res.data;
+        openEdit(post_id) {
+            let post = this.getPostById(post_id);
+            this.showModal(true, 'edit', post);
         },
-        openDelete(id) {
-            this.showModal(true, 'Delete post', 'delete', 'Delete');
-            this.fetchId = id;
+        openDelete(post_id) {
+            let post = this.getPostById(post_id);
+            this.showModal(true, 'delete', post);
         },
-        acceptedModal() {
-            console.log('a')
+        // data arg gives post id when post is edit/deleted.
+        // When creating post, provides input object
+        acceptedModal(data) {
+            
             // If we delete post
-            if(this.modalType === 0)
+            if(this.modalType === 'delete')
             {
-                this.deletePost(this.fetchId);
+                this.deletePost(data);
             }
             // If we edit post
-            else if(this.modalType === 1)
+            else if(this.modalType === 'edit')
             {
-                this.editPost(this.post.id, this.post.title, this.post.author, this.post.body, this.post.created_at);
+                let post = this.getPostById(data);
+                this.editPost(post.id, post.title, post.author, post.body, post.created_at);
             }
             // If we create post
             else
-                this.createPost(this.title, this.author, this.body);     
+                this.createPost(data.title, data.author, data.body);     
         },
         async createPost(title, author, body) {
             if(!this.checkInput(title, author, body))
                 return 0;
 
+            
             let dater = new DateFormater();
             let json = JsonBuilder.getArticleJson(title, body, author, dater.regularFormat(), dater.regularFormat())
             let res = await API.create(Constants.URL_ARTICLES, json);
 
             if(res)
             {
-                this.showMessage(true, 'Successfully created post', 'is-success');
+                this.showMessage(true, 'Successfully created post', 0, 'is-success');
+                this.showModal(false);
             }
             else {
-                this.showMessage(true, 'Problem occurred', 'is-warning');
+                this.showMessage(true, 'Problem occurred', 1, 'is-warning');
             }
         },
         async editPost(id, title, author, body, created_at) {
@@ -206,42 +194,57 @@ export default {
 
             if(res)
             {
-                this.showMessage(true, 'Successfully edited post', 'is-success');
-                this.post = json;
-                this.post.id = id;
+                this.showMessage(true, 'Successfully edited post', 0, 'is-success');
+                this.showModal(false);
             }
             else
-                this.showMessage(true, 'Problem occurred', 'is-warning');
+                this.showMessage(true, 'Problem occurred', 1, 'is-warning');
         },
         async deletePost(id) {
             let res = await API.delete(Constants.URL_ARTICLES+"/"+id);
 
             if(res)
             {
-                this.showMessage(true, 'Successfully deleted post', 'is-success');
-                this.deleteId = id; // given to post-preview as property
+                this.showMessage(true, 'Successfully deleted post', 0, 'is-success');
+                this.showModal(false);
             }
             else
-                this.showMessage(true, 'Problem occurred', 'is-warning');
+                this.showMessage(true, 'Problem occurred', 1, 'is-warning');
+        },
+        getPostById(post_id) {
+            let index = this.posts.findIndex(item => item.id === post_id)
+            return this.posts[index];
         },
         checkInput(title, author, body) {
             if(!title || !author || !body )
             {
-                this.showMessage(true, 'You must fill all fields', 'is-warning');
+                this.showMessage(true, 'You must fill all fields', 1, 'is-warning');
                 return false;
             }
             return true;
-        },
-        cleanInput() {
-            this.title = '';
-            this.author = '';
-            this.body = '';
         },
         async getAuthors() {
             let res = await API.get(Constants.URL_AUTHORS);
 
             if(res)
-                this.authors = res.data;
+                return res.data;
+            return false;
+        },
+        async getPosts() {
+            let args = `?_limit=${this.perPage}&_page=${this.page}&q=${this.searchText}`;
+            let res = await API.get(Constants.URL_ARTICLES+args);
+
+            if(res && res.data.length > 0)
+            {
+                let totalPosts = res.headers['x-total-count'];
+                this.totalPages = Math.ceil(totalPosts / this.perPage);
+
+                return res.data;
+            }
+            else if(!res)
+                this.error = true
+            
+            return [];
         },
         search() {
             this.searchText = this.$refs.searchInput.value;
@@ -258,12 +261,13 @@ export default {
             }
         }
     },
-    mounted() {
+    async mounted() {
         // Getting authors
-        this.getAuthors();
-        this.showMessage(true, 'Successfully created post', 0, 'is-success');
+        this.authors = await this.getAuthors();
+        // Getting posts
+        this.posts = await this.getPosts();
     }
-};
+}
 </script>
 
 <style>
