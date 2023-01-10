@@ -28,9 +28,9 @@
             <div class="field mb-5">
                 <label class="label">Search</label>
                 <div class="control mb-2">
-                    <input class="input" type="text" placeholder="Text input" ref="searchInput">
+                    <input v-debounce:1000ms="search" class="input" type="text" placeholder="Search text goes here..." ref="searchInput">
                 </div>
-                <button class="button" @click="search">Search</button>
+                <!-- <button class="button" @click="search">Search</button> -->
             </div>
 
             <label class="label">Authors</label>
@@ -257,8 +257,9 @@ export default {
             this.totalPages = 0;
             return [];
         },
-        async search() {
-            this.searchText = this.$refs.searchInput.value;
+        async search(text) {
+            //this.searchText = this.$refs.searchInput.value;
+            this.searchText = text;
 
             router.push({ 
                 name: 'Home', 
