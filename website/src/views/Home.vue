@@ -233,7 +233,7 @@ export default {
         async getPosts() {
             let args = `?_limit=${this.perPage}&_page=${this.page}&q=${this.searchText}`;
             let res = await API.get(Constants.URL_ARTICLES+args);
-
+            
             if(res && res.data.length > 0)
             {
                 let totalPosts = res.headers['x-total-count'];
@@ -241,25 +241,50 @@ export default {
 
                 return res.data;
             }
-            else
+            else if(!res)
                 this.error = true;
             
             return [];
         },
-        search() {
+        async search() {
             this.searchText = this.$refs.searchInput.value;
-            
+
             router.push({ 
                 name: 'Page', 
                 query: { s: this.searchText } 
             }).catch((error) => {});
+
+            this.posts = await this.getPosts();
+
+            // Messaging
+            if(!this.arePostFound())
+            {
+                this.totalPages = 0;
+                this.showMessage(true, 'No posts found', 0, 'is-warning');
+            }
+            else 
+                this.showMessage(false)
+
+            console.log(this.page)
+            console.log(this.totalPages)
+        },
+        getSearchedFor() {
+            return this.$route.query['s'] ? this.$route.query['s'] : '';
         },
         changePage(page) {
             if(this.page != page)
             {
                 console.log(page);
             }
+        },
+        arePostFound() {
+            return this.posts.length > 0;
         }
+    },
+    created() {
+        // Setting searched data
+        this.searchText = this.getSearchedFor();
+
     },
     async mounted() {
         // Getting authors
@@ -267,10 +292,12 @@ export default {
         // Getting posts
         this.posts = await this.getPosts();
 
-        if(!this.posts[0] && this.error)
+        if(!this.arePostFound() && this.error)
             this.showMessage(true, 'Problem occurred', 0, 'is-danger');
-        else if(!this.posts[0])
-            this.showMessage(true, 'No posts found', 0, 'is-warning');
+        else if(!this.arePostFound())
+            this.showMessage(true, 'No posts found', 0, 'is-warning'); 
+
+            
     }
 }
 </script>
