@@ -52,6 +52,10 @@ import * as Constants  from '../constants'
 import API from '../classes/API'
 import JsonBuilder from '../classes/JsonBuilder'
 import DateFormater from '../classes/DateFormater'
+// Mixins
+import { ModalControl } from '../mixins/ModalControl'
+import { MessageControl } from '../mixins/MessageControl'
+import { Request } from '../mixins/Request'
 // Components
 import Modal from './../components/Modal'
 import Message from './../components/Message'
@@ -59,27 +63,10 @@ import PostCard from './../components/PostCard'
 import Pagination from './../components/Pagination'
 
 export default {
+    mixins:[ ModalControl, MessageControl, Request ],
     components: { Modal, Message, Pagination, PostCard },
     data() {
         return {
-            // Modal
-            modalShow: false,
-            // Types:
-            // create
-            // delete
-            // edit
-            modalType: null,
-            modalPost: null,    // post to display data inside modal
-
-            // Modal message
-            msgShow: false,
-            msgStyle: null,    // bulma css style
-            // Locations:
-            // 0 - inside page
-            // 1 - inside modal
-            msgLocation: null,
-            msgText: null,
-
             posts: [
                 /* {
                     id: 1,
@@ -90,7 +77,6 @@ export default {
                     updated_at: new Date('2022-12-19 06:00:00'.replace(/-/g,"/"))
                 } */
             ],
-            error: false,
 
             // Authors
             authors: {
@@ -111,31 +97,6 @@ export default {
         }
     },
     methods: {
-        showModal(show, type, post) {
-            if(!show)
-            {
-                this.modalShow = false;
-                if(this.msgLocation == 1)
-                    this.showMessage(false);
-                return 0; 
-            }
-
-            this.modalShow = true
-            this.modalType = type;
-            this.modalPost = post;
-        },
-        showMessage(show, text, loc, style) {
-            if(!show)
-            {
-                this.msgShow = false;
-                return 0; 
-            }
-
-            this.msgShow = true;
-            this.msgLocation = loc; 
-            this.msgStyle = style; 
-            this.msgText = text;
-        },
         openCreate() {
             this.showModal(true, 'create');
         },
@@ -219,21 +180,6 @@ export default {
             }
             else
                 this.showMessage(true, 'Problem occurred', 1, 'is-warning');
-        },
-        checkInput(title, author, body) {
-            if(!title || !author || !body )
-            {
-                this.showMessage(true, 'You must fill all fields', 1, 'is-warning');
-                return false;
-            }
-            return true;
-        },
-        async getAuthors() {
-            let res = await API.get(Constants.URL_AUTHORS);
-
-            if(res)
-                return res.data;
-            return false;
         },
         async getPosts() {
             let args = `?_limit=${this.perPage}&_page=${this.page}&q=${this.searchText}`;
