@@ -103,6 +103,7 @@ export default {
             // Pagination
             page: 1,
             totalPages: 0,
+            totalPosts: 0,
             perPage: 10,
 
             // Search
@@ -175,6 +176,7 @@ export default {
 
             if(res)
             {
+                json.id = this.getLastPost().id + 1;
                 this.posts.push(json);
 
                 this.showMessage(true, 'Successfully created post', 0, 'is-success');
@@ -239,8 +241,8 @@ export default {
             
             if(res && res.data.length > 0)
             {
-                let totalPosts = res.headers['x-total-count'];
-                this.totalPages = Math.ceil(totalPosts / this.perPage);
+                this.totalPosts = res.headers['x-total-count'];
+                this.totalPages = Math.ceil(this.totalPosts / this.perPage);
 
                 return res.data;
             }
@@ -288,6 +290,9 @@ export default {
         },
         removeFromArray(array, index) {
             array.splice(index, 1)
+        },
+        getLastPost() {
+            return this.posts[this.posts.length - 1];
         }
     },
     created() {
