@@ -52,9 +52,12 @@ export default {
         // Creates object with inputed data
         getPostData() {
             return {
+                id: null,
                 title: this.title,
                 body: this.body,
-                author: this.author
+                author: this.author,
+                created_at: null,
+                updated_at: null
             }
         }
     }

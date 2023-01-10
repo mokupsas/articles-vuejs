@@ -12,19 +12,19 @@
     
             <slot></slot>
 
-            <input class="input mb-3" type="text" placeholder="Title" v-model="post.title">
+            <input class="input mb-3" type="text" placeholder="Title" v-model="title">
             <div class="select mb-3">
-                <select v-model="post.author">
+                <select v-model="author">
                     <option selected disabled value="">Select author</option>
                     <option v-for="author in authors">{{ author.name }}</option>
                 </select>
             </div>
-            <textarea class="textarea" placeholder="Body">{{ post.body }}</textarea>
+            <textarea class="textarea" placeholder="Body">{{ body }}</textarea>
 
         </section>
 
         <footer class="modal-card-foot">
-            <button class="button is-success" @click="$emit('acceptedModal')">Edit</button>
+            <button class="button is-success" @click="$emit('acceptedModal', getPostData())">Edit</button>
             <button class="button" @click="closeModal">Close</button>
         </footer>
     </div>
@@ -38,10 +38,31 @@ export default {
         authors: { required: true },
         post: { default: null }
     },
+    data() {
+        return {
+            id: this.post.id,
+            title: this.post.title,
+            body: this.post.body,
+            author: this.post.author,
+            created_at: this.post.created_at,
+            updated_at: this.post.updated_at
+        }
+    },
     methods: {
         closeModal()
         {
             this.$emit('closeModal')
+        },
+        // Creates object with inputed data
+        getPostData() {
+            return {
+                id: this.post.id,
+                title: this.title,
+                body: this.body,
+                author: this.author,
+                created_at: this.created_at,
+                updated_at: this.updated_at
+            }
         }
     }
 }

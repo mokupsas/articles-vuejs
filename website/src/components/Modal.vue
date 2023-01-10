@@ -52,18 +52,24 @@ export default {
             this.$emit('acceptedModal', ret);
         },
         makeData(data) {
-            // When creating, returns input object
+            // When creating/editing, returns input object
             // ---
+            // data.id
             // data.title
             // data.author
             // data.body
-            if(this.type == 'create')
+            // data.created_at
+            // data.updated_at
+            if(this.type == 'create' || this.type == 'edit')
                 return data;
-            // When post editing or deleting, returns post id
+            // When deleting post, returns object
+            // data.id
             else
             {
                if(typeof this.post !== 'undefined')
-                        return this.post.id;
+                        return {
+                            id: this.post.id
+                        };
             }
 
             return null;

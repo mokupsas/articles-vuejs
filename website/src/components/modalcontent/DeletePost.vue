@@ -39,6 +39,17 @@ export default {
         closeModal()
         {
             this.$emit('closeModal')
+        },
+        // Creates object with inputed data
+        getPostData() {
+            return {
+                id: this.post.id,
+                title: this.title,
+                body: this.body,
+                author: this.author,
+                created_at: this.post.created_at,
+                updated_at: this.post.updated_at
+            }
         }
     }
 }

@@ -69,7 +69,7 @@ export default {
             // delete
             // edit
             modalType: null,
-            modalPost: 'aa',    // post to display data inside modal
+            modalPost: null,    // post to display data inside modal
 
             // Modal message
             msgShow: false,
@@ -153,13 +153,12 @@ export default {
             // If we delete post
             if(this.modalType === 'delete')
             {
-                this.deletePost(data);
+                this.deletePost(data.id);
             }
             // If we edit post
             else if(this.modalType === 'edit')
             {
-                let post = this.getPostById(data);
-                this.editPost(post.id, post.title, post.author, post.body, post.created_at);
+                this.editPost(data.id, data.title, data.author, data.body, data.created_at);
             }
             // If we create post
             else
@@ -176,6 +175,8 @@ export default {
 
             if(res)
             {
+                this.posts.push(json);
+
                 this.showMessage(true, 'Successfully created post', 0, 'is-success');
                 this.showModal(false);
             }
@@ -194,6 +195,9 @@ export default {
 
             if(res)
             {
+                let index = this.posts.findIndex(item => item.id === id)
+                this.posts[index] = json;
+
                 this.showMessage(true, 'Successfully edited post', 0, 'is-success');
                 this.showModal(false);
             }
@@ -205,15 +209,14 @@ export default {
 
             if(res)
             {
+                let index = this.posts.findIndex(item => item.id === id)
+                this.removeFromArray(this.posts, index);
+
                 this.showMessage(true, 'Successfully deleted post', 0, 'is-success');
                 this.showModal(false);
             }
             else
                 this.showMessage(true, 'Problem occurred', 1, 'is-warning');
-        },
-        getPostById(post_id) {
-            let index = this.posts.findIndex(item => item.id === post_id)
-            return this.posts[index];
         },
         checkInput(title, author, body) {
             if(!title || !author || !body )
@@ -278,6 +281,13 @@ export default {
         },
         arePostFound() {
             return this.posts.length > 0;
+        },
+        getPostById(post_id) {
+            let index = this.posts.findIndex(item => item.id === post_id)
+            return this.posts[index];
+        },
+        removeFromArray(array, index) {
+            array.splice(index, 1)
         }
     },
     created() {
