@@ -2,14 +2,14 @@
 
     <div class="columns mt-6 mb-6">
         <div class="column is-three-quarters">
-
-            <message v-show="msgShow && msgLocation == 0" :type="msgStyle" :close="0" @closeMessage="showMessage(false)">{{ msgText }}</message>
            
             <h1 v-if="!searchText" class="title">Posts</h1>
             <h1 v-else class="title">Search for: {{ searchText }}</h1>
             <hr/>
 
-            <modal v-if="modalShow" :type="modalType" :authors="authors" :post="modalPost" @acceptedModal="acceptedModal" @closeModal="showModal(false)">
+            <message v-show="msgShow && msgLocation == 0" :type="msgStyle" :close="0" @closeMessage="showMessage(false)">{{ msgText }}</message>
+
+            <modal v-if="modalShow && !error" :type="modalType" :authors="authors" :post="modalPost" @acceptedModal="acceptedModal" @closeModal="showModal(false)">
                 <message v-show="msgShow && msgLocation == 1" :type="msgStyle" close="1" @closeMessage="showMessage(false)">{{ msgText }}</message>
             </modal>
 
@@ -241,8 +241,8 @@ export default {
 
                 return res.data;
             }
-            else if(!res)
-                this.error = true
+            else
+                this.error = true;
             
             return [];
         },
@@ -266,6 +266,11 @@ export default {
         this.authors = await this.getAuthors();
         // Getting posts
         this.posts = await this.getPosts();
+
+        if(!this.posts[0] && this.error)
+            this.showMessage(true, 'Problem occurred', 0, 'is-danger');
+        else
+            this.showMessage(true, 'No posts found', 0, 'is-warning');
     }
 }
 </script>

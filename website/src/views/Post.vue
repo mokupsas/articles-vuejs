@@ -64,7 +64,6 @@ export default {
             msgText: null,
 
             // Post data
-            postFound: true,
             post: {
                 /* id: 1,
                 title: 'Title1',
@@ -73,6 +72,7 @@ export default {
                 created_at: new Date('2022-12-12 05:00:00'.replace(/-/g,"/")),
                 updated_at: new Date('2022-12-19 06:00:00'.replace(/-/g,"/")) */
             },
+            error: false,
 
             // Authors
             authors: {
@@ -177,6 +177,7 @@ export default {
             if(res)
                return res.data;
             
+            this.error = true;
             return [];
         },
         async getAuthors() {
@@ -193,6 +194,13 @@ export default {
         this.authors = await this.getAuthors();
         // Getting current post
         this.post = await this.getPost(post_id); 
+
+        if(!this.post.id && this.error)
+            this.showMessage(true, 'Problem occurred', 0, 'is-danger');
+        else
+        {
+            this.showMessage(true, 'No posts found', 0, 'is-warning');
+        }
     }
 }
 </script>
