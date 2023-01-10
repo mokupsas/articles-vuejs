@@ -242,8 +242,14 @@ export default {
                 return res.data;
             }
             else if(!res)
+            {
                 this.error = true;
+                this.showMessage(true, 'Problem occurred', 0, 'is-danger');
+            }
+            else
+                this.showMessage(true, 'No posts found', 0, 'is-warning');
             
+            this.totalPages = 0;
             return [];
         },
         async search() {
@@ -256,25 +262,18 @@ export default {
 
             this.posts = await this.getPosts();
 
-            // Messaging
-            if(!this.arePostFound())
-            {
-                this.totalPages = 0;
-                this.showMessage(true, 'No posts found', 0, 'is-warning');
-            }
-            else 
+            // If post found, clean previous message
+            if(this.arePostFound())
                 this.showMessage(false)
-
-            console.log(this.page)
-            console.log(this.totalPages)
         },
         getSearchedFor() {
             return this.$route.query['s'] ? this.$route.query['s'] : '';
         },
-        changePage(page) {
+        async changePage(page) {
             if(this.page != page)
             {
-                console.log(page);
+                this.page = page;
+                this.posts = await this.getPosts();
             }
         },
         arePostFound() {
@@ -285,19 +284,14 @@ export default {
         // Setting searched data
         this.searchText = this.getSearchedFor();
 
+        // Getting current page if given
+        this.page = this.$route.params.page ? this.$route.params.page : this.page
     },
     async mounted() {
         // Getting authors
         this.authors = await this.getAuthors();
         // Getting posts
-        this.posts = await this.getPosts();
-
-        if(!this.arePostFound() && this.error)
-            this.showMessage(true, 'Problem occurred', 0, 'is-danger');
-        else if(!this.arePostFound())
-            this.showMessage(true, 'No posts found', 0, 'is-warning'); 
-
-            
+        this.posts = await this.getPosts(); 
     }
 }
 </script>
